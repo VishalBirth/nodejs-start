@@ -1,0 +1,31 @@
+db.category.insert({
+    _id : "Electronics", 
+    ancestors : ["Electronics"]
+})
+db.category.insert({
+    _id : "Phones",
+    parent : "Electronics",  
+    ancestors : ["Electronics", "Phones"]
+})
+db.category.insert({
+    _id : "Andriod",
+    parent : "Phones",  
+    ancestors : ["Electronics", "Phones", "Andriod"]
+})
+db.category.insert({
+    _id : "IPhone",
+    parent : "Phones",  
+    ancestors : ["Electronics", "Phones", "IPhone"]
+})
+
+db.category.insert({
+    _id : "Computers",
+    parent : "Electronics",  
+    ancestors : ["Electronics", "Computers"]
+})
+
+db.products.insert({
+    name : "Asus", 
+    price : {amount : 20, currency : "USD"}, 
+    category : "Electronics"    
+})

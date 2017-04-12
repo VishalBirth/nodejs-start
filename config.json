@@ -1,0 +1,5 @@
+{
+    "cookie_secret" : "",
+    "mongodb_connection": "mongodb://localhost:27017/heros", 
+    "portno" : "2000"
+}
