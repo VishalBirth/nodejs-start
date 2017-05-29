@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { IProductDocument } from '../interfaces/product.interface';
+import { IProductDocument } from './product.interface';
 import { Schema } from "mongoose";
 
 export interface IProductModel extends mongoose.Model<IProductDocument> {

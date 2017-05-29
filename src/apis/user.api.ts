@@ -1,3 +1,11 @@
+import { ACCOUNT_STATUS } from '../utilities/constants';
+/**
+ * Error Codes :
+ * Failure : 101-149
+ * Success : 151-199
+ */
+
+import { HelpingFunctions } from '../utilities/helpingFunctions';
 import { IUserModel } from '../models/user.model';
 import * as express from 'Express';
 import * as mongoose from 'mongoose';
@@ -17,74 +25,88 @@ export class User{
     public getRouter(): express.Router{
         return this.router;
     }
-    // private fboutput(req : Request, res : Response){
-    //     FB.settings.setSecret('6fefa341f0bde9402c75894ad9c26be3');
-    //     FB.settings.setClientId('644197232449850');
-    //     res.send("hi.. output is on console.")
-    // }
 
     private setRoutes(){
         this.router.get('/', this.getUsers);
-        // this.router.get('/fboutput', this.fboutput)
-
-//        this.setUpAuth( this.router);
-        // this.router.use(require("express-session")({
-        //      secret : "VishalKumar"
-        // }))
-        // this.router.use(passport.initialize());
-        // this.router.use(passport.session());
-        // this.router.get("/hi", (req, res)=>{res.send("Really!")})
-        // this.router.get("/auth/facebook", passport.authenticate('facebook', {scope : ['email']}));
-        // this.router.get("/auth/facebook/callback", passport.authenticate('facebook', {failureRedirect : '/fail'}), (req, res)=>{
-        //     res.send("Welcome "+ req.user.profile.username);
-        // })
-
-        // this.router.post('/auth/facebook/token',
-        //     passport.authenticate('facebook-token'),
-        //     function (req, res) {
-        //     // do something with req.user
-        //         res.send(req.user? 200 : 401);
-        //     }
-        // );
+        this.router.post('/', this.addUser);
+        this.router.get('/:userId', this.verifyUser)
+    }
+    
+    private verifyUser(req : Request, res : Response){
+        var userId = req.params.userId
+        var model = DatabaseConnection.getModels();
+        model.user.findById(userId).exec().then(user =>{
+            if(user != null){
+                user.profile.accountStatus = ACCOUNT_STATUS.VERIFIED;
+                user.save().then(user=>{
+                    res.send(HelpingFunctions.getJsonSuccessResponse("Your account has been verified!", null, 152));
+                }, HelpingFunctions.handleError(res))
+            }else{
+                res.send(HelpingFunctions.getJsonFailureResponse("Your Link has been expired, Please create your account again.", null, 103))
+            }
+        }, HelpingFunctions.handleError(res))
     }
 
+    private addUser(req : Request, res : Response){
+        var email = req.body.email;
+        var username = req.body.username; 
+        var password = req.body.password;
+        var model = DatabaseConnection.getModels();
+        model.user.findOne({"profile.email": email}).exec().then(user=>{
+            if(user == null || user.profile.accountStatus == ACCOUNT_STATUS.REGISTERED){
+                
+                /**
+                 * @TODO : SEND Email to User 
+                 * and provide Response to user.
+                */ 
+
+                var text = "localhost:2000/user/"+user._id
+                let mailOptions = {
+                    to: email, // list of receivers
+                    subject: 'Account Verification', // Subject line
+                    text: text  // plain text body
+                    //html: '<b>Hello world ?</b>' // html body
+                };
+
+                HelpingFunctions.sendEmail(mailOptions, (err, info)=>{
+                    if (err) {
+                        console.log(err);
+                        res.send(HelpingFunctions.getJsonFailureResponse(err, null, 102))
+                    }else{
+                        if(user == null){
+                            var newUser = new model.user({
+                                profile : {
+                                    email : email, 
+                                    password : password, 
+                                    user_name : username,  
+                                }, 
+                                data : {
+                                    oauth : ""
+                                }
+                            })
+                            newUser.save().then(user =>{
+                                finalResponse(info)
+                            }, HelpingFunctions.handleError(res))
+                        }else{
+                            finalResponse(info)
+                        }
+                    }
+                })
+
+            }else{
+                res.send(HelpingFunctions.getJsonFailureResponse("Your account already exist!", null, 101));
+            }
+        }, HelpingFunctions.handleError(res))
+
+        function finalResponse(info){
+            console.log('Message %s sent: %s', info.messageId, info.response);
+            res.send(HelpingFunctions.getJsonSuccessResponse("Authentication link has been delivered to your account. Please verify your account.", null, 151))
+        }
+    }
     private getUsers(req : Request, res : Response){
         var model = DatabaseConnection.getModels();
-        model.user.findAll().exec().then((output)=>{
-            res.send(output);
+        model.user.find().exec().then(output => {
+            res.send(output)
         })
     }
-   /* private setUpAuth( app : express.Router){
-         var User = DatabaseConnection.getModels().user
-        passport.serializeUser((user, done)=>{
-            done(null, user["_id"]);
-        });
-        passport.deserializeUser((id, done)=>{
-            User.findOne({_id : id}).exec(done);
-        })
-        passport.use(new FacebookTokenStrategy(
-            {
-                clientID : "644197232449850", 
-                clientSecret : "6fefa341f0bde9402c75894ad9c26be3"
-                ,callbackURL : "http://localhost:2000/user/auth/facebook/callback"
-            }, function(accessToken , refrestToken, profile, done){
-                if(!profile.emails || !profile.emails.length){
-                    return done('No email are associated with this account.')
-                }
-
-                User.findOneAndUpdate(
-                    {'data.oauth' : profile.id},
-                    {
-                        $set:{
-                            'profile.username' : profile.emails[0].value, 
-                            'profile.picture' : 'http://graph.facebook.com/'+profile.id.toString()+'/picture?type=large'                            
-                        }
-                    }, 
-                    { 'new': true, upsert : true, runValidators: true}, 
-                    (err, user)=>{done(err, user);}
-                )
-            }
-        ))
-    }
-    */
 }

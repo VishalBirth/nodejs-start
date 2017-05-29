@@ -2,10 +2,10 @@
  * Connection will be reopened even if server is closed..
  */
 
+var Configuration = require( '../../config.json')
 
 import { IModel, ModelCreation } from '../models/model';
 import mongoose = require("mongoose")
-var config = require("../../config.json")
 
 import { IUserModel } from "../models/user.model"; //import IUserModel
 
@@ -22,7 +22,7 @@ export class DatabaseConnection{
     private static instance : DatabaseConnection = null;
 
     private constructor(){
-        var connection_string : string = config["mongodb_connection"];
+        var connection_string : string = Configuration.mongodb_connection;
         this.connection = mongoose.createConnection(connection_string);
         this.model = ModelCreation.createModels(this.connection);
     }

@@ -5,12 +5,12 @@
 var server = require("../dist/server");
 var debug = require("debug")("express:server");
 var http = require("http");
-var config = require("../config.json");
+var ConfigurationFile = require("../config.json");
 var DatabaseConnection = require("../dist/utilities/databaseconnection")
 
 
 //create http server
-var httpPort = normalizePort(process.env.PORT || config["portno"]);
+var httpPort = normalizePort(process.env.PORT || ConfigurationFile.portno);
 var app = server.Server.bootstrap().app;
 app.set("port", httpPort);
 var httpServer = http.createServer(app);

@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { ICategoryDocument } from '../interfaces/category.interface';
+import { ICategoryDocument } from './category.interface';
 import { Schema } from "mongoose";
 
 export interface ICategoryModel extends mongoose.Model<ICategoryDocument> {
