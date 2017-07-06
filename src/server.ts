@@ -1,5 +1,3 @@
-import { Product } from './apis/product.api';
-import { Category } from './apis/category.api';
 import { User } from './apis/user.api';
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
@@ -8,20 +6,18 @@ import * as logger from "morgan";
 import * as path from "path";
 import errorHandler = require("errorhandler");
 import methodOverride = require("method-override");
-var config = require("../config.json") //import config file
 import mongoose = require("mongoose"); //import mongoose
 
 //api 
 import { API } from './apis/api';
 
-//interfaces
-import { IUser } from "./interfaces/user.interface"; //import IUser
 
 //models
 import { IModel } from "./models/model"; //import IModel
 import { IUserModel } from "./models/user.model"; //import IUserModel
 //database
 import { DatabaseConnection } from "./utilities/databaseconnection"
+import { config } from '../config';
 
 
 /**
@@ -59,7 +55,7 @@ export class Server {
     this.app = express();
 
     //configure application
-    this.config();
+    this.configuration();
 
     //add routes
     this.setupRoutes();
@@ -73,24 +69,16 @@ export class Server {
    */
   public setupRoutes() {
     this.app.use("/",(new API).getRouter());
-    this.app.use("/user/", (new User).getRouter());
-    this.app.use("/category/", (new Category).getRouter());
-    this.app.use("/product/", (new Product).getRouter());
-    this.app.use( function (req, res, next){
-        console.log(res.send("hehehehe"));
-        next();
-    })
-    
   }
  
   /**
     * Configure application
     *
     * @class Server
-    * @method config
+    * @method configuration
     */
     
-  public config() {
+  public configuration() {
 
     //use q promises
     global.Promise = require("q").Promise;
@@ -121,7 +109,7 @@ export class Server {
     }));
 
     //use cookie parker middleware middlware
-    this.app.use(cookieParser(config["cookie_secret"]));
+    this.app.use(cookieParser(config.cookie_secret));
 
     //use override middlware
     this.app.use(methodOverride());

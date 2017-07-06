@@ -2,11 +2,9 @@
  * Connection will be reopened even if server is closed..
  */
 
-
 import { IModel, ModelCreation } from '../models/model';
 import mongoose = require("mongoose")
-var config = require("../../config.json")
-
+import { config } from '../../config';
 import { IUserModel } from "../models/user.model"; //import IUserModel
 
 /**
@@ -22,7 +20,7 @@ export class DatabaseConnection{
     private static instance : DatabaseConnection = null;
 
     private constructor(){
-        var connection_string : string = config["mongodb_connection"];
+        var connection_string : string = config.mongodb_connection
         this.connection = mongoose.createConnection(connection_string);
         this.model = ModelCreation.createModels(this.connection);
     }
@@ -40,7 +38,6 @@ export class DatabaseConnection{
     public static openConnection() : DatabaseConnection{
         if(this.instance == null){
             this.instance = new DatabaseConnection();
-            //getting connection name from config.json
         }
         return this.instance
     }
@@ -64,3 +61,4 @@ export class DatabaseConnection{
         this.instance.connection.close();
     }
 }
+

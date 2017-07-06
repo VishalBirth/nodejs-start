@@ -2,23 +2,25 @@
 "use strict";
 
 //module dependencies
-var server = require("../dist/server");
+var server = require("../dist/src/server");
 var debug = require("debug")("express:server");
 var http = require("http");
-var config = require("../config.json");
-var DatabaseConnection = require("../dist/utilities/databaseconnection")
+var config = require("../dist/config");
+var DatabaseConnection = require("../dist/src/utilities/databaseconnection")
 
 
 //create http server
-var httpPort = normalizePort(process.env.PORT || config["portno"]);
+var httpPort = normalizePort(process.env.PORT || config.config.portno);
 var app = server.Server.bootstrap().app;
 app.set("port", httpPort);
 var httpServer = http.createServer(app);
 
 
-
+console.log("1");
+console.log(httpPort)
 //listen on provided ports
 httpServer.listen(httpPort);
+
 
 //add error handler
 process.on("error", onError);

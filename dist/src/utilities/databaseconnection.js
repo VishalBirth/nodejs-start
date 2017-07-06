@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const model_1 = require("../models/model");
 const mongoose = require("mongoose");
-var config = require("../../config.json");
+const config_1 = require("../../config");
 class DatabaseConnection {
     constructor() {
-        var connection_string = config["mongodb_connection"];
+        var connection_string = config_1.config.mongodb_connection;
         this.connection = mongoose.createConnection(connection_string);
         this.model = model_1.ModelCreation.createModels(this.connection);
     }

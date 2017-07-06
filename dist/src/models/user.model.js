@@ -5,18 +5,12 @@ exports.userSchema = new mongoose_1.Schema({
     profile: {
         createdAt: Date,
         email: { type: String, required: true, lowercase: true },
-        userName: { type: String, required: true, lowercase: true }
+        userName: { type: String, lowercase: true }
     },
     data: {
-        oauth: { type: String, required: true },
-        cart: [{
-                product: mongoose_1.Schema.Types.ObjectId,
-                quantity: {
-                    type: Number,
-                    default: 1,
-                    min: 1
-                }
-            }]
+        oauth: { type: String },
+        password: { type: String },
+        accountStatus: { type: Number }
     }
 });
 exports.userSchema.pre("save", function (next) {

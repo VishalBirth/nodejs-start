@@ -1,29 +1,30 @@
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { IUser, IUserDocument } from '../interfaces/user.interface';
 import { Schema } from "mongoose";
 
-export interface IUserModel extends mongoose.Model<IUserDocument> {
-  //custom methods for your model would be defined here
-  findAll() : mongoose.Query<IUserModel[]>
+export interface IUser {  
+  profile : {
+      createdAt: Date;
+      email : string;
+      userName : string;
+  };
+  data : {
+    oauth : string, 
+    password : string, 
+    accountStatus : number
+  }
 }
 
 export var userSchema: Schema = new Schema({
   profile : {
       createdAt: Date,
       email : {type : String, required : true, lowercase :  true},
-      userName : {type : String, required : true, lowercase :  true}
+      userName : {type : String, lowercase :  true}
   },
   data : {
-    oauth : {type : String, required : true}, 
-    cart : [{
-      product : Schema.Types.ObjectId,
-      quantity : {
-        type : Number, 
-        default : 1, 
-        min : 1
-      } 
-    }]
+    oauth : {type : String}, 
+    password : {type : String}, 
+    accountStatus : {type : Number}
   }
 });
 
@@ -33,6 +34,15 @@ userSchema.pre("save", function(next) {
   }
   next();
 });
+
+
+
+export interface IUserDocument extends  IUser, mongoose.Document {}
+
+export interface IUserModel extends mongoose.Model<IUserDocument> {
+  //custom methods for your model would be defined here
+  findAll() : mongoose.Query<IUserModel[]>
+}
 
 userSchema.statics.findAll = function() {
   return this.find();
